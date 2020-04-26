@@ -1,0 +1,100 @@
+app.component.html
+
+<div class="container">
+  <h2>Product Form......Vishal</h2>
+  <form class="form" (ngSubmit)="myFunc()" method="GET">
+    Enter Product ID:<input class="form-control col-sm-4" type="text" [(ngModel)]="pid" name="pid"><br>
+    Enter Product Name:<input class="form-control col-sm-4" type="text" [(ngModel)]="pname" name="pname"><br>
+    Enter Product Price:<input class="form-control col-sm-4" type="text" [(ngModel)]="pprice" name="pprice"><br>
+    <input type="submit" class="btn btn-info" value="Add">
+  </form>
+</div>
+<div *ngIf="openTable">
+  <table class="table table-stripped table-bordered">
+    <thead>
+      <tr>
+        <th>Product ID</th>
+        <th>Product Name</th>
+        <th>Product Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let prod2 of prodList">
+        <td>{{prod2.id}}</td>
+        <td>{{prod2.name}}</td>
+        <td>{{prod2.price}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+********************************************************************
+
+app.component.ts
+
+i:number
+    dataString:string
+    emp:Employee
+    pid:number
+    pname:string
+    pprice:number
+    prod:Product
+    prodList:Product[]
+    openTable:boolean=false;
+
+    constructor(private pService:ProductService){
+
+    }
+    
+  myFunc(){
+    this.openTable=true;
+
+    this.pService.addProduct(this.pid,this.pname,this.pprice).subscribe(
+      data =>{
+        this.prodList=data;
+        /*for(let i=0;i<this.prodList.length;i++){
+          this.dataString="ID: "+this.prodList[i].id+" Name: "+this.prodList[i].name+" Price: "+this.prodList[i].price;
+          alert(this.dataString);
+        }*/
+      }
+    );
+
+  }
+}
+
+************************************************************************
+Product.ts
+
+export class Product{
+    id:number
+    name:string
+    price:number
+}
+
+************************************************************************
+
+Product.services.ts
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductService {
+
+
+  private baseUrl="http://localhost:9070/product/add";
+  myUrl:string;
+  error:string;
+
+  constructor(private http:HttpClient) { }
+
+  addProduct(pid:number,pname:string,pprice:number):Observable<any>{
+    this.myUrl=this.baseUrl+"?pid="+pid+"&pname="+pname+"&pprice="+pprice;
+
+    return this.http.get(this.myUrl);
+  }
+}
+*****************************************************************
